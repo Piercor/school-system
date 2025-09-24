@@ -16,6 +16,7 @@
 using System.ComponentModel;
 using System.Data;
 using System.Reflection.Metadata;
+using System.Threading.Tasks.Dataflow;
 using App;
 
 List<IUser> users = new List<IUser>();
@@ -48,6 +49,8 @@ while (running)
     {
       case "1":
         Console.Clear();
+
+
         Console.WriteLine("\n\nLog in to TeachLine.\n");
 
         Console.Write("\nUsername: ");
@@ -74,8 +77,9 @@ while (running)
         break;
 
       case "2":
-
         Console.Clear();
+
+
         Console.WriteLine("\n\nRetrieve password.\n");
         Console.WriteLine("\nWrite your username.");
         string checkUsername = Console.ReadLine();
@@ -128,6 +132,8 @@ while (running)
         case "1": // Create new account
           {
             Console.Clear();
+
+
             Console.WriteLine("\n\nCreate a new account.\n");
             Console.WriteLine("\n[1] Create a new student account.");
             Console.WriteLine("\n[2] Create a new teacher account.");
@@ -272,8 +278,9 @@ while (running)
           break;
 
         case "3": // Manage courses
-
           Console.Clear();
+
+
           Console.WriteLine("\n\nManage courses.\n");
 
           Console.WriteLine("\n[1] Courses overview.");
@@ -289,6 +296,8 @@ while (running)
             case "1": // Courses overview
               {
                 Console.Clear();
+
+
                 Console.WriteLine("\n\nCourses overview.\n");
 
                 Console.Write($"\n{string.Join(" | ", studentCourses.Keys)}\n");
@@ -299,6 +308,8 @@ while (running)
                 if (!string.IsNullOrEmpty(choosedCourse))
                 {
                   Console.Clear();
+
+
                   Console.WriteLine($"\n\n{choosedCourse} - Overview.\n");
 
                   foreach ((string courseKey, Course course) in studentCourses)
@@ -328,6 +339,8 @@ while (running)
               }
             case "2": // Add new course
               Console.Clear();
+
+
               Console.WriteLine("\n\nAdd new course.\n");
 
               Console.Write("\nCourse's ID: ");
@@ -369,14 +382,17 @@ while (running)
             case "3": // Update course
               {
                 Console.Clear();
+
+
                 Console.WriteLine("\n\nChoose course to update.\n");
 
                 Console.Write($"\n{string.Join(" | ", studentCourses.Keys)}\n");
 
                 Console.Write("\n\nCourse: ");
                 string choosedCourse = Console.ReadLine();
-
                 Console.Clear();
+
+
                 Console.WriteLine($"\n\n{choosedCourse} - Overview.\n");
 
                 foreach ((string courseKey, Course course) in studentCourses)
@@ -453,13 +469,16 @@ while (running)
             case "4": // Register/remove student
               {
                 Console.Clear();
+
+
                 Console.WriteLine("\n\nRegister or remove a student from a course.");
                 Console.WriteLine("\nCourses:");
                 Console.WriteLine($"\n{string.Join(" | ", studentCourses.Keys)}");
                 Console.Write("\nChoose course: ");
                 string choosedCourse = Console.ReadLine();
-
                 Console.Clear();
+
+
                 Console.WriteLine($"\n\nStudents registered in {choosedCourse}:\n");
 
                 foreach ((string courseKey, Course course) in studentCourses)
@@ -538,6 +557,8 @@ while (running)
             case "5": // Manage status
               {
                 Console.Clear();
+
+
                 Console.WriteLine("\n\nChoose course to activate/inactivate.\n");
 
                 Console.Write($"\n{string.Join(" | ", studentCourses.Keys)}\n");
@@ -596,6 +617,8 @@ while (running)
       {
         case "1":
           Console.Clear();
+
+
           Console.Write("\n\nWrite a message. \n");
           Console.WriteLine("\nWho do you want to message?\n");
           Console.WriteLine("\n[1] A student.");
@@ -604,20 +627,26 @@ while (running)
           Console.Write("\nType [1-3]: ");
 
           Type selectedType = null;
+          string isType = "";
 
           switch (Console.ReadLine())
           {
+
             case "1":
               selectedType = typeof(Student);
+              isType = "student";
               break;
 
             case "2":
               selectedType = typeof(Teacher);
+              isType = "teacher";
               break;
 
             case "3":
               selectedType = typeof(Admin);
+              isType = "admin";
               break;
+
             default:
               Console.Write("\nInvalid selection. Press ENTER to continue. ");
               Console.ReadLine();
@@ -628,12 +657,13 @@ while (running)
 
           if (filteredUsers.Count == 0)
           {
-            Console.WriteLine($"\nNo users of type {selectedType} where found.");
+            Console.WriteLine($"\nNo users of type {isType} where found.");
             Console.Write($"\nPress ENTER to continue. ");
             Console.ReadLine();
           }
-
           Console.Clear();
+
+
           Console.WriteLine($"\n\n{selectedType.Name}s\n");
 
           foreach (var user in filteredUsers)
@@ -641,13 +671,14 @@ while (running)
             Console.WriteLine(user.Username);
           }
 
-          Console.WriteLine($"\nSelect a {selectedType} to send a message");
+          Console.Write($"\nSelect a {isType} to send a message: ");
           string selectedUser = Console.ReadLine();
 
           foreach (var user in filteredUsers)
           {
             if (user.Username == selectedUser)
             {
+              Console.WriteLine($"\nWrite a new message to {user.Username}:");
               string newMessage = Console.ReadLine();
 
               if (!string.IsNullOrEmpty(newMessage))
@@ -699,13 +730,13 @@ while (running)
             {
               if (!string.IsNullOrEmpty(selectedDocument) && document.Name == selectedDocument)
               {
-                Console.Write($"\nGrade the document (IG/ V/ VG): '{selectedDocument}': ");
+                Console.Write($"\nGrade the document (IG/ G/ VG): '{selectedDocument}': ");
                 string newGrade = Console.ReadLine();
                 if (newGrade == "IG" || newGrade == "G" || newGrade == "VG")
                 {
                   document.Grade = newGrade;
                   document.Signed = t.Username;
-                  Console.WriteLine($"\nDocument {document.Name} has been graded with {newGrade}");
+                  Console.WriteLine($"\nDocument '{document.Name}' has been graded with '{newGrade}'.");
                   Console.WriteLine("\nDo you want to add feedback? Leave empty if not.");
                   document.Feedback = Console.ReadLine();
                 }
@@ -746,7 +777,7 @@ while (running)
 
     if (active_user is Student s)
     {
-      Console.WriteLine("\nWelcome to your main page, " + s.Username);
+      Console.WriteLine($"\nWelcome to your main page, {s.Username}.\n");
       int newMessage = 0;
 
       foreach ((string msgKey, List<Message> msgList) in studentMessages)
@@ -759,11 +790,7 @@ while (running)
           }
         }
       }
-
-      Console.WriteLine($"\nYou have {newMessage} message/s.");
-
-
-      Console.WriteLine("\n[1] See your messages.");
+      Console.WriteLine($"\n[1] See your messages. {(newMessage > 0 ? $"You have {newMessage} new message/s." : "")}");
       Console.WriteLine("\n[2] Load a new document.");
       Console.WriteLine("\n[3] See your documents.");
       Console.WriteLine("\n[4] Logout.\n");
@@ -772,13 +799,44 @@ while (running)
       switch (Console.ReadLine())
       {
         case "1":
-          if (message != "")
+
+          if (studentMessages.Count > 0)
           {
-            Console.WriteLine($"\n{message} - from {teacherName}");
+            foreach ((string msgKey, List<Message> msgList) in studentMessages)
+            {
+              foreach (Message msg in msgList)
+              {
+                if (!string.IsNullOrEmpty(msg.Text))
+                {
+                  int messageIndex = 0;
+                  for (int i = 0; i < msgList.Count; i++)
+                  {
+                    Console.WriteLine($"\n[{i + 1}] {(msg.Read ? "(Read)" : "(Unread)")} - from {msg.Sender}");
+                  }
+                  string selectedMessage = Console.ReadLine();
+                  if (int.TryParse(selectedMessage, out messageIndex) && messageIndex > 0 && messageIndex <= msgList.Count)
+                  {
+                    Console.Clear();
+
+                    Console.WriteLine($"\n\nMessage from {msgList[messageIndex - 1].Sender}:");
+
+                    Console.WriteLine($"\n'{msgList[messageIndex - 1].Text}'");
+                    msg.Read = true;
+                    Console.Write("\nPress ENTER to continue. ");
+                    Console.ReadLine();
+                    break;
+                  }
+
+                }
+              }
+            }
           }
           else
           {
             Console.WriteLine("\nYou have no messages.");
+            Console.Write("\nPress ENTER to continue. ");
+            Console.ReadLine();
+            break;
           }
           break;
 
