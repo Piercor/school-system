@@ -11,6 +11,8 @@
 // Admins can create courses.
 //...
 
+
+
 using System.ComponentModel;
 using System.Data;
 using System.Reflection.Metadata;
@@ -21,8 +23,7 @@ users.Add(new Student("teststudent", "t@s", "pass"));
 users.Add(new Teacher("teacher", "password"));
 users.Add(new Admin("Default Admin", "admin", "admin"));
 
-//      studentName      dokumentName  betyg
-Dictionary<string, Dictionary<string, string>> studentDocuments = new Dictionary<string, Dictionary<string, string>>();
+Dictionary<string, SDocument> studentDocuments = new Dictionary<string, SDocument>();
 Dictionary<string, Course> studentCourses = new Dictionary<string, Course>();
 
 Dictionary<string, List<string>> studentMessages = new Dictionary<string, List<string>>(); // Work in progress
@@ -71,8 +72,13 @@ while (running)
           if (user.TryLogin(username, password))
           {
             active_user = user;
-            break;
+            // break;
           }
+        }
+        if (active_user == null)
+        {
+          Console.Write("\nInvalid username/password. Press ENTER to continue. ");
+          Console.ReadLine();
         }
         break;
 
@@ -158,8 +164,6 @@ while (running)
                 else
                 {
                   users.Add(new Student(newStudentName, newStudentEmail, newStudentPass));
-
-                  studentDocuments.Add(newStudentName, new Dictionary<string, string>());
                 }
                 break;
 
@@ -588,69 +592,78 @@ while (running)
           Console.ReadLine();
           break;
       }
+    }
+    if (active_user is Teacher t)
+    {
+      Console.WriteLine("\nWelcome to your main page, " + t.Username);
+      Console.WriteLine("\n[1] Write a message.");
+      Console.WriteLine("\n[2] Grade documents.");
+      Console.WriteLine("\n[3] Logout.\n");
+      Console.WriteLine("\nChoose an option [1-3]");
 
-      if (active_user is Teacher t)
+      switch (Console.ReadLine())
       {
-        Console.WriteLine("\nWelcome to your main page, " + t.Username);
-        Console.WriteLine("\n[1] Write a message.");
-        Console.WriteLine("\n[2] Grade documents.");
-        Console.WriteLine("\n[3] Logout.\n");
-        Console.WriteLine("\nChoose an option [1-3]");
+        case "1":
 
-        switch (Console.ReadLine())
-        {
-          case "1":
+          Console.Write("\nWrite message: ");
+          message = Console.ReadLine();
+          teacherName = t.Username;
+          if (message != "")
+          {
+            messageCount++;
+          }
+          break;
 
-            Console.Write("\nWrite message: ");
-            message = Console.ReadLine();
-            teacherName = t.Username;
-            if (message != "")
+        case "2":
+
+          Console.WriteLine("\nChoose an student to see their documents.");
+          Console.WriteLine($"\n{string.Join(", ", studentDocuments.Keys)}.\n");
+
+          string searchStudent = Console.ReadLine();
+
+          if (!string.IsNullOrEmpty(searchStudent))
+          {
+            if (studentDocuments.ContainsKey(searchStudent))
+              Console.WriteLine($"\nDocuments uploaded by {searchStudent}:\n");
             {
-              messageCount++;
-            }
-            break;
-
-          case "2":
-
-            Console.WriteLine("\nChoose an student to see their documents.");
-            Console.WriteLine($"\n{string.Join(", ", studentDocuments.Keys)}.\n");
-
-            string searchStudent = Console.ReadLine();
-
-            if (studentDocuments.TryGetValue(searchStudent, out var studentKey))
-            {
-              if (!string.IsNullOrEmpty(searchStudent))
+              foreach ((string docKey, SDocument document) in studentDocuments)
               {
-                Console.WriteLine($"\nDocuments uploaded by {searchStudent}:\n");
-
-                foreach (var docName in studentKey)
+                if (document.Grade == "")
                 {
-                  if (docName.Value == "")
-                  {
-                    Console.WriteLine($"'{docName.Key}' - Not graded yet.");
-                  }
-                  else
-                  {
-                    Console.WriteLine($"'{docName.Key}' - Grade: {docName.Value}.");
-                  }
-                }
-
-                Console.WriteLine($"\nSelect document to grade:");
-
-                string selectedDocument = Console.ReadLine();
-
-                if (!string.IsNullOrEmpty(selectedDocument) && studentKey.ContainsKey(selectedDocument))
-                {
-                  Console.Write($"\nGrade the document: '{selectedDocument}' :");
-                  string newGrade = Console.ReadLine();
-
-                  studentDocuments[searchStudent][selectedDocument] = newGrade;
+                  Console.WriteLine($"'{document.Name}' - Not graded yet.");
                 }
                 else
                 {
-                  Console.Write("\nInvalid input. Press ENTER to continue. ");
+                  Console.WriteLine($"'{document.Name}' - Grade: {document.Grade}.");
+                }
+              }
+            }
+            Console.WriteLine($"\nSelect document to grade:");
+            string selectedDocument = Console.ReadLine();
+
+            foreach ((string docKey, SDocument document) in studentDocuments)
+            {
+              if (!string.IsNullOrEmpty(selectedDocument) && document.Name == selectedDocument)
+              {
+                Console.Write($"\nGrade the document (IG/ V/ VG): '{selectedDocument}': ");
+                string newGrade = Console.ReadLine();
+                if (newGrade == "IG" || newGrade == "G" || newGrade == "VG")
+                {
+                  document.Grade = newGrade;
+                  document.Signed = t.Username;
+                  Console.WriteLine($"\nDocument {document.Name} has been graded with {newGrade}");
+                  Console.WriteLine("\nDo you want to add feedback? Leave empty if not.");
+                  document.Feedback = Console.ReadLine();
+                }
+                else
+                {
+                  Console.WriteLine("\nDocuments can only be graded with 'IG', 'G' or 'VG'.");
+                  Console.Write("\nPress ENTER to continue. ");
                   Console.ReadLine();
                 }
+                Console.Write("\nPress ENTER to continue.");
+                Console.ReadLine();
+                break;
               }
               else
               {
@@ -658,105 +671,108 @@ while (running)
                 Console.ReadLine();
               }
             }
-            break;
-
-          case "3":
-            active_user = null;
-            break;
-
-          default:
+          }
+          else
+          {
             Console.Write("\nInvalid input. Press ENTER to continue. ");
             Console.ReadLine();
-            break;
-        }
+          }
+          break;
+
+        case "3":
+          active_user = null;
+          break;
+
+        default:
+          Console.Write("\nInvalid input. Press ENTER to continue. ");
+          Console.ReadLine();
+          break;
+      }
+    }
+
+    if (active_user is Student s)
+    {
+      Console.WriteLine("\nWelcome to your main page, " + s.Username);
+
+      if (messageCount > 0)
+      {
+        Console.WriteLine($"\nYou have {messageCount} message/s.");
       }
 
-      if (active_user is Student s)
+      Console.WriteLine("\n[1] See your messages.");
+      Console.WriteLine("\n[2] Load a new document.");
+      Console.WriteLine("\n[3] See your documents.");
+      Console.WriteLine("\n[4] Logout.\n");
+      Console.WriteLine("\nChoose an option [1-4]");
+
+      switch (Console.ReadLine())
       {
-        Console.WriteLine("\nWelcome to your main page, " + s.Username);
+        case "1":
+          if (message != "")
+          {
+            Console.WriteLine($"\n{message} - from {teacherName}");
+          }
+          else
+          {
+            Console.WriteLine("\nYou have no messages.");
+          }
+          break;
 
-        if (messageCount > 0)
-        {
-          Console.WriteLine($"\nYou have {messageCount} message/s.");
-        }
+        case "2":
+          {
+            Console.Write("\nDocument's name: ");
+            string newDocument = Console.ReadLine();
 
-        Console.WriteLine("\n[1] See your messages.");
-        Console.WriteLine("\n[2] Load a new document.");
-        Console.WriteLine("\n[3] See your documents.");
-        Console.WriteLine("\n[4] Logout.\n");
-        Console.WriteLine("\nChoose an option [1-4]");
+            Console.Write("\nCourse: ");
+            string documentCourse = Console.ReadLine();
 
-        switch (Console.ReadLine())
-        {
-          case "1":
-            if (message != "")
+            if (!string.IsNullOrEmpty(newDocument))
             {
-              Console.WriteLine($"\n{message} - from {teacherName}");
-            }
-            else
-            {
-              Console.WriteLine("\nYou have no messages.");
+              studentDocuments.Add(s.Username, new SDocument(s.Username, newDocument, documentCourse, "", "", ""));
             }
             break;
 
-          case "2":
-            {
-              Console.Write("\nDocument's name: ");
-              string newDocument = Console.ReadLine();
+          }
+        case "3":
 
-              if (!string.IsNullOrEmpty(newDocument))
+          Console.WriteLine("\nYour documents:\n");
+
+          foreach ((string docKey, SDocument document) in studentDocuments)
+          {
+            if (s.Username == document.Author)
+            {
+              if (document.Grade == "")
               {
-                studentDocuments[s.Username][newDocument] = "";
+                Console.WriteLine($"'{document.Name}' - Not graded yet.");
               }
-              break;
-
-            }
-          case "3":
-
-            Console.WriteLine("\nYour documents:\n");
-
-
-            foreach (var studentKey in studentDocuments)
-            {
-              if (s.Username == studentKey.Key)
+              else
               {
-                foreach (var docName in studentKey.Value)
+                Console.WriteLine($"'{document.Name}' - grade: {document.Grade}. Graded by {document.Signed}");
+                if (document.Feedback != "")
                 {
-                  if (docName.Value == "")
-                  {
-                    Console.WriteLine($"'{docName.Key}' - Not graded yet.");
-                  }
-                  else
-                  {
-                    Console.WriteLine($"'{docName.Key}' - grade: {docName.Value}.");
-                  }
+                  Console.WriteLine($"\nFeedback from {document.Signed}: {document.Feedback}");
                 }
               }
+
             }
-            break;
+          }
+          Console.Write("\nPress ENTER to continue. ");
+          Console.ReadLine();
+          break;
 
-          case "4":
-            active_user = null;
-            break;
+        case "4":
+          active_user = null;
+          break;
 
-          default:
-            Console.Write("\nInvalid input. Press ENTER to continue. ");
-            Console.ReadLine();
-            break;
-        }
+        default:
+          Console.Write("\nInvalid input. Press ENTER to continue. ");
+          Console.ReadLine();
+          break;
       }
-
-      // Console.WriteLine("Logout");
-      // switch (Console.ReadLine())
-      // {
-      //   case "logout":
-      //     active_user = null;
-      //     break;
-      // }
     }
-    // Console.WriteLine($"\nLogged in? {active_user != null}");
-
-    // Console.Write("\nPress ENTER to continue.");
-    // Console.ReadLine();
   }
+  // Console.WriteLine($"\nLogged in? {active_user != null}");
+
+  // Console.Write("\nPress ENTER to continue.");
+  // Console.ReadLine();
 }
