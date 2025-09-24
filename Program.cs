@@ -25,20 +25,11 @@ users.Add(new Admin("Default Admin", "admin", "admin"));
 
 Dictionary<string, SDocument> studentDocuments = new Dictionary<string, SDocument>();
 Dictionary<string, Course> studentCourses = new Dictionary<string, Course>();
-
-Dictionary<string, List<string>> studentMessages = new Dictionary<string, List<string>>(); // Work in progress
+Dictionary<string, List<Message>> studentMessages = new Dictionary<string, List<Message>>();
 
 IUser? active_user = null;
 
 bool running = true;
-
-// work in progress >>>
-
-string message = "";
-int messageCount = 0;
-string teacherName = "";
-
-// <<<
 
 while (running)
 {
@@ -604,13 +595,76 @@ while (running)
       switch (Console.ReadLine())
       {
         case "1":
+          Console.Clear();
+          Console.Write("\n\nWrite a message. \n");
+          Console.WriteLine("\nWho do you want to message?\n");
+          Console.WriteLine("\n[1] A student.");
+          Console.WriteLine("\n[2] A Teacher.");
+          Console.WriteLine("\n[3] An admin.");
+          Console.Write("\nType [1-3]: ");
 
-          Console.Write("\nWrite message: ");
-          message = Console.ReadLine();
-          teacherName = t.Username;
-          if (message != "")
+          Type selectedType = null;
+
+          switch (Console.ReadLine())
           {
-            messageCount++;
+            case "1":
+              selectedType = typeof(Student);
+              break;
+
+            case "2":
+              selectedType = typeof(Teacher);
+              break;
+
+            case "3":
+              selectedType = typeof(Admin);
+              break;
+            default:
+              Console.Write("\nInvalid selection. Press ENTER to continue. ");
+              Console.ReadLine();
+              break;
+          }
+
+          var filteredUsers = users.Where(u => u.GetType() == selectedType).ToList();
+
+          if (filteredUsers.Count == 0)
+          {
+            Console.WriteLine($"\nNo users of type {selectedType} where found.");
+            Console.Write($"\nPress ENTER to continue. ");
+            Console.ReadLine();
+          }
+
+          Console.Clear();
+          Console.WriteLine($"\n\n{selectedType.Name}s\n");
+
+          foreach (var user in filteredUsers)
+          {
+            Console.WriteLine(user.Username);
+          }
+
+          Console.WriteLine($"\nSelect a {selectedType} to send a message");
+          string selectedUser = Console.ReadLine();
+
+          foreach (var user in filteredUsers)
+          {
+            if (user.Username == selectedUser)
+            {
+              string newMessage = Console.ReadLine();
+
+              if (!string.IsNullOrEmpty(newMessage))
+              {
+                if (!studentMessages.ContainsKey(t.Username))
+                {
+                  studentMessages[t.Username] = new List<Message>();
+                }
+                studentMessages[t.Username].Add(new Message(user.Username, newMessage, t.Username, false));
+              }
+              else
+              {
+                Console.WriteLine("\nMessage can't be empty. Press ENTER to continue.");
+                Console.ReadLine();
+              }
+              break;
+            }
           }
           break;
 
@@ -693,11 +747,21 @@ while (running)
     if (active_user is Student s)
     {
       Console.WriteLine("\nWelcome to your main page, " + s.Username);
+      int newMessage = 0;
 
-      if (messageCount > 0)
+      foreach ((string msgKey, List<Message> msgList) in studentMessages)
       {
-        Console.WriteLine($"\nYou have {messageCount} message/s.");
+        foreach (Message msg in msgList)
+        {
+          if (msg.Read == false)
+          {
+            newMessage++;
+          }
+        }
       }
+
+      Console.WriteLine($"\nYou have {newMessage} message/s.");
+
 
       Console.WriteLine("\n[1] See your messages.");
       Console.WriteLine("\n[2] Load a new document.");
