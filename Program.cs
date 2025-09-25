@@ -333,11 +333,12 @@ while (running)
                   case "2":
                     remUserType = "Teacher";
                     break;
-                  case "4":
-                    break;
 
                   case "3":
                     remUserType = "Admin";
+                    break;
+
+                  case "4":
                     break;
 
                   default:
@@ -738,7 +739,7 @@ while (running)
     if (active_user is Teacher t)
     {
       Console.WriteLine("\nWelcome to your main page, " + t.Name);
-      Console.WriteLine("\n[1] Write a message.");
+      Console.WriteLine("\n[1] Messages.");
       Console.WriteLine("\n[2] Grade documents.");
       Console.WriteLine("\n[3] Logout.\n");
       Console.WriteLine("\nChoose an option [1-3]");
@@ -746,35 +747,33 @@ while (running)
       switch (Console.ReadLine())
       {
         case "1":
+
           Console.Clear();
-
-
-          Console.Write("\n\nWrite a message. \n");
+          Console.Write("\n\nMessages. \n");
           Console.WriteLine("\nWho do you want to message?\n");
-          Console.WriteLine("\n[1] A student.");
-          Console.WriteLine("\n[2] A Teacher.");
-          Console.WriteLine("\n[3] An admin.");
-          Console.Write("\nType [1-3]: ");
+          Console.WriteLine("\n[1] Student.");
+          Console.WriteLine("\n[2] Teacher.");
+          Console.WriteLine("\n[3] Admin.");
+          Console.WriteLine("\n[4] Back to previous menu.");
+          Console.Write("\nSelect an option [1-4]: ");
 
-          Type selectedType = null;
-          string isType = "";
+          string msgUserType = "";
 
           switch (Console.ReadLine())
           {
-
             case "1":
-              selectedType = typeof(Student);
-              isType = "student";
+              msgUserType = "Student";
               break;
 
             case "2":
-              selectedType = typeof(Teacher);
-              isType = "teacher";
+              msgUserType = "Teacher";
               break;
 
             case "3":
-              selectedType = typeof(Admin);
-              isType = "admin";
+              msgUserType = "Admin";
+              break;
+
+            case "4":
               break;
 
             default:
@@ -783,49 +782,70 @@ while (running)
               break;
           }
 
-          var filteredUsers = users.Where(u => u.GetType() == selectedType).ToList();
-
-          if (filteredUsers.Count == 0)
-          {
-            Console.WriteLine($"\nNo users of type {isType} where found.");
-            Console.Write($"\nPress ENTER to continue. ");
-            Console.ReadLine();
-          }
           Console.Clear();
+          Console.WriteLine($"\n\n{msgUserType}s accounts in the system:\n\n");
 
-
-          Console.WriteLine($"\n\n{selectedType.Name}s\n");
-
-          foreach (var user in filteredUsers)
+          if ((msgUserType == "Student" && !users.Any(u => u is Student)) || (msgUserType == "Teacher" && !users.Any(u => u is Teacher)) || (msgUserType == "Admin" && !users.Any(u => u is Admin)))
           {
-            Console.WriteLine(user.Name);
+            Console.WriteLine($"No users of type {msgUserType.ToLower()} were found");
+            Console.Write("\n\nPress ENTER to continue. ");
+            Console.ReadLine();
+            break;
+          }
+          else
+          {
+            foreach (IUser user in users)
+            {
+              if (msgUserType == user.IsType)
+              {
+                Console.WriteLine(user.Name);
+              }
+            }
           }
 
-          Console.Write($"\nSelect a {isType} to send a message: ");
-          string selectedUser = Console.ReadLine();
+          Console.Write("\n\nChoose an user to send a message to: ");
+          string messageUser = Console.ReadLine();
 
-          foreach (var user in filteredUsers)
+          if (!string.IsNullOrEmpty(messageUser))
           {
-            if (user.Name == selectedUser)
+            foreach (IUser user in users)
             {
-              Console.WriteLine($"\nWrite a new message to {user.Name}:");
-              string newMessage = Console.ReadLine();
-
-              if (!string.IsNullOrEmpty(newMessage))
+              if (messageUser == user.Name)
               {
-                if (!studentMessages.ContainsKey(t.Name))
+                Console.WriteLine($"\nWrite a new message to {user.Name}:\n");
+                string newMessage = Console.ReadLine();
+
+                if (!string.IsNullOrEmpty(newMessage))
                 {
-                  studentMessages[t.Name] = new List<Message>();
+                  if (!studentMessages.ContainsKey(t.Name))
+                  {
+                    studentMessages[t.Name] = new List<Message>();
+                  }
+                  studentMessages[t.Name].Add(new Message(user.Name, newMessage, t.Name, false));
+                  Console.WriteLine($"\n\nMessage sended to {user.Name}.\n");
+                  Console.Write("\nPress ENTER to continue. ");
+                  Console.ReadLine();
                 }
-                studentMessages[t.Name].Add(new Message(user.Name, newMessage, t.Name, false));
+                else
+                {
+                  Console.Write("\n\nMessage can't be empty. Press ENTER to continue. ");
+                  Console.ReadLine();
+                }
+                break;
               }
               else
               {
-                Console.WriteLine("\nMessage can't be empty. Press ENTER to continue.");
+                Console.WriteLine($"\nNo users found with the name {messageUser}");
+                Console.Write("\nPress ENTER to continue. ");
                 Console.ReadLine();
               }
               break;
             }
+          }
+          else
+          {
+            Console.Write("\nInvalid input. Press ENTER to continue. ");
+            Console.ReadLine();
           }
           break;
 
