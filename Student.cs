@@ -2,21 +2,21 @@ namespace App;
 
 class Student : IUser
 {
-  public string Username { get; set; }
+  public string Name { get; set; }
   public string Email { get; set; }
   public string _password { get; set; }
   public string IsType { get; set; }
 
-  public Student(string u, string e, string p, string it)
+  public Student(string n, string e, string p, string it)
   {
-    Username = u;
+    Name = n;
     Email = e;
     _password = p;
     IsType = it;
   }
 
-  public bool TryLogin(string username, string password)
+  public bool TryLogin(string email, string password)
   {
-    return username == Email && password == _password;
+    return email == Email && password == _password;
   }
 }

@@ -3,19 +3,21 @@ namespace App;
 
 class Teacher : IUser
 {
-  public string Username { get; set; }
+  public string Name { get; set; }
+  public string Email { get; set; }
   public string _password { get; set; }
   public string IsType { get; set; }
 
-  public Teacher(string u, string p, string it)
+  public Teacher(string u, string e, string p, string it)
   {
-    Username = u;
+    Name = u;
+    Email = e;
     _password = p;
     IsType = it;
   }
 
-  public bool TryLogin(string username, string password)
+  public bool TryLogin(string email, string password)
   {
-    return username == Username && password == _password;
+    return email == Email && password == _password;
   }
 }

@@ -20,9 +20,10 @@ using System.Threading.Tasks.Dataflow;
 using App;
 
 List<IUser> users = new List<IUser>();
-users.Add(new Student("teststudent", "t@s", "pass", "Student"));
-users.Add(new Teacher("teacher", "password", "Teacher"));
-users.Add(new Admin("Default Admin", "admin", "admin", "Admin"));
+
+users.Add(new Student("teststudent", "stu@dent", "pass", "Student"));
+users.Add(new Teacher("teacher", "tea@cher", "pass", "Teacher"));
+users.Add(new Admin("Default Admin", "ad@min", "pasa", "Admin"));
 
 Dictionary<string, SDocument> studentDocuments = new Dictionary<string, SDocument>();
 Dictionary<string, Course> studentCourses = new Dictionary<string, Course>();
@@ -81,14 +82,14 @@ while (running)
 
 
         Console.WriteLine("\n\nRetrieve password.\n");
-        Console.WriteLine("\nWrite your username.");
-        string checkUsername = Console.ReadLine();
+        Console.WriteLine("\nWrite your email.");
+        string checkEmail = Console.ReadLine();
 
-        IUser findUsername = users.FirstOrDefault(u => u.Username.Equals(checkUsername, StringComparison.OrdinalIgnoreCase));
+        IUser findEmail = users.FirstOrDefault(u => u.Email.Equals(checkEmail, StringComparison.OrdinalIgnoreCase));
 
-        if (findUsername != null)
+        if (findEmail != null)
         {
-          Console.WriteLine($"\nPassword: {findUsername._password}");
+          Console.WriteLine($"\nPassword: {findEmail._password}");
           Console.Write("\nPress ENTER to continue. ");
           Console.ReadLine();
         }
@@ -120,87 +121,86 @@ while (running)
     {
       Console.WriteLine($"\nWelcome to your main page, {a.Name}.\n");
 
-      Console.WriteLine("\n[1] Create a new account.");
-      Console.WriteLine("\n[2] Remove an account.");
-      Console.WriteLine("\n[3] Manage courses.");
-      Console.WriteLine("\n[4] System overview.");
-      Console.WriteLine("\n[5] Log out.");
-      Console.Write("\nChoose an option [1-5]: ");
+      Console.WriteLine("\n[1] Manage accounts.");
+      Console.WriteLine("\n[2] Manage courses.");
+      Console.WriteLine("\n[3] System overview.");
+      Console.WriteLine("\n[4] Log out.");
+      Console.Write("\nChoose an option [1-4]: ");
 
       switch (Console.ReadLine())
       {
-        case "1": // Create new account
+        case "1": // Manage accounts
           {
             Console.Clear();
-
-
             Console.WriteLine("\n\nCreate a new account.\n");
-            Console.WriteLine("\n[1] Create a new student account.");
-            Console.WriteLine("\n[2] Create a new teacher account.");
-            Console.WriteLine("\n[3] Create a new admin account.");
+            Console.WriteLine("\n[1] Create a new account.");
+            Console.WriteLine("\n[2] Update an account.");
+            Console.WriteLine("\n[3] Remove an account.");
             Console.WriteLine("\n[4] Back to previous menu.");
             Console.Write("\nChoose an option [1-4]: ");
 
             switch (Console.ReadLine())
             {
-              case "1": // Student account
-                Console.Write("\n\nStudent's name: ");
-                string newStudentName = Console.ReadLine();
+              case "1": // Create new account
+                Console.Clear();
+                Console.WriteLine("\n\nCreate a new account.\n");
+                Console.WriteLine("\n[1] Create a new student account.");
+                Console.WriteLine("\n[2] Create a new teacher account.");
+                Console.WriteLine("\n[3] Create a new admin account.");
+                Console.WriteLine("\n[4] Back to previous menu.");
+                Console.Write("\nChoose an option [1-4]: ");
+                string newUserType = "";
 
-                Console.Write("\nStudent's email: ");
-                string newStudentEmail = Console.ReadLine();
-
-                Console.Write("\nStudent's password: ");
-                string newStudentPass = Console.ReadLine();
-
-                if (string.IsNullOrEmpty(newStudentName) || string.IsNullOrEmpty(newStudentEmail) || string.IsNullOrEmpty(newStudentPass))
+                switch (Console.ReadLine())
                 {
-                  Console.Write("\nStudents's data cannot be empty. Press ENTER to continue");
-                  Console.ReadLine();
+                  case "1":
+                    newUserType = "Student";
+                    break;
+
+                  case "2":
+                    newUserType = "Teacher";
+                    break;
+
+                  case "3":
+                    newUserType = "Admin";
+                    break;
+                }
+
+                Console.Write($"\n{newUserType} name: ");
+                string newUserName = Console.ReadLine();
+                Console.Write($"\n{newUserType} email: ");
+                string newUserEmail = Console.ReadLine();
+                Console.Write($"\n{newUserType} password: ");
+                string newUserPass = Console.ReadLine();
+                if (!string.IsNullOrEmpty(newUserName) || !string.IsNullOrEmpty(newUserEmail) || !string.IsNullOrEmpty(newUserPass))
+                {
+                  if (newUserType == "Student")
+                  {
+                    users.Add(new Student(newUserName, newUserEmail, newUserPass, "Student"));
+                  }
+                  else if (newUserType == "Teacher")
+                  {
+                    users.Add(new Teacher(newUserName, newUserEmail, newUserPass, "Teacher"));
+                  }
+                  else if (newUserType == "Admin")
+                  {
+                    users.Add(new Admin(newUserName, newUserEmail, newUserPass, "Admin"));
+                  }
                 }
                 else
                 {
-                  users.Add(new Student(newStudentName, newStudentEmail, newStudentPass, "Student"));
+                  Console.Write($"\n{newUserType}'s data cannot be empty. Press ENTER to continue");
+                  Console.ReadLine();
                 }
+
                 break;
 
-              case "2": // Teacher account
-                Console.Write("\nTeacher's username: ");
-                string newTeacherUsername = Console.ReadLine();
+              case "2": // Update an account
 
-                Console.Write("\nTeacher's password: ");
-                string newTeacherPass = Console.ReadLine();
-
-                if (string.IsNullOrEmpty(newTeacherUsername) || string.IsNullOrEmpty(newTeacherPass))
-                {
-                  Console.Write("\nTeacher's data cannot be empty. Press ENTER to continue");
-                  Console.ReadLine();
-                }
-                else
-                {
-                  users.Add(new Teacher(newTeacherUsername, newTeacherPass, "Teacher"));
-                }
                 break;
 
-              case "3": // Admin account
-                Console.Write("\nAdmin's name: ");
-                string newAdminName = Console.ReadLine();
+              case "3": // Remove an account
 
-                Console.Write("\nAdmin's username: ");
-                string newAdminUsername = Console.ReadLine();
-
-                Console.Write("\nAdmin's password: ");
-                string newAdminPass = Console.ReadLine();
-
-                if (string.IsNullOrEmpty(newAdminName) || string.IsNullOrEmpty(newAdminUsername) || string.IsNullOrEmpty(newAdminPass))
-                {
-                  Console.Write("\nAdmin's data cannot be empty. Press ENTER to continue");
-                  Console.ReadLine();
-                }
-                else
-                {
-                  users.Add(new Admin(newAdminName, newAdminUsername, newAdminPass, "Admin"));
-                }
                 break;
 
               case "4": // Back to menu
@@ -214,7 +214,7 @@ while (running)
             break;
           }
 
-        case "2": // Remove an account
+        case "X": // Remove an account
           Console.Clear();
           Console.WriteLine("\n\nWhich type of account do you want to remove?\n");
           Console.WriteLine("\n[1] Student.");
@@ -257,13 +257,13 @@ while (running)
 
           foreach (var user in filteredUsers)
           {
-            Console.WriteLine(user.Username);
+            Console.WriteLine(user.Name);
           }
 
           Console.Write($"\nEnter the username of the {selectedType.Name.ToLower()} to remove: ");
           string selectedUser = Console.ReadLine();
 
-          IUser removeUser = users.FirstOrDefault(u => u.Username.Equals(selectedUser, StringComparison.OrdinalIgnoreCase));
+          IUser removeUser = users.FirstOrDefault(u => u.Name.Equals(selectedUser, StringComparison.OrdinalIgnoreCase));
 
           if (removeUser != null)
           {
@@ -278,10 +278,9 @@ while (running)
           Console.ReadLine();
           break;
 
-        case "3": // Manage courses
+        case "2": // Manage courses
+
           Console.Clear();
-
-
           Console.WriteLine("\n\nManage courses.\n");
 
           Console.WriteLine("\n[1] Courses overview.");
@@ -511,7 +510,7 @@ while (running)
                 {
                   if (user is Student student)
                   {
-                    Console.WriteLine(student.Username);
+                    Console.WriteLine(student.Name);
                   }
                 }
 
@@ -521,7 +520,7 @@ while (running)
                   {
                     Console.Write("\nStudent name: ");
                     string regStudent = Console.ReadLine();
-                    bool studentFound = users.Any(u => u.Username.Equals(regStudent, StringComparison.OrdinalIgnoreCase));
+                    bool studentFound = users.Any(u => u.Name.Equals(regStudent, StringComparison.OrdinalIgnoreCase));
 
 
                     if (!string.IsNullOrEmpty(regStudent) && studentFound)
@@ -592,11 +591,11 @@ while (running)
 
           break;
 
-        case "4": // System overview
+        case "3": // System overview
 
           break;
 
-        case "5": // Log out
+        case "4": // Log out
           active_user = null;
           break;
 
@@ -608,7 +607,7 @@ while (running)
     }
     if (active_user is Teacher t)
     {
-      Console.WriteLine("\nWelcome to your main page, " + t.Username);
+      Console.WriteLine("\nWelcome to your main page, " + t.Name);
       Console.WriteLine("\n[1] Write a message.");
       Console.WriteLine("\n[2] Grade documents.");
       Console.WriteLine("\n[3] Logout.\n");
@@ -669,7 +668,7 @@ while (running)
 
           foreach (var user in filteredUsers)
           {
-            Console.WriteLine(user.Username);
+            Console.WriteLine(user.Name);
           }
 
           Console.Write($"\nSelect a {isType} to send a message: ");
@@ -677,18 +676,18 @@ while (running)
 
           foreach (var user in filteredUsers)
           {
-            if (user.Username == selectedUser)
+            if (user.Name == selectedUser)
             {
-              Console.WriteLine($"\nWrite a new message to {user.Username}:");
+              Console.WriteLine($"\nWrite a new message to {user.Name}:");
               string newMessage = Console.ReadLine();
 
               if (!string.IsNullOrEmpty(newMessage))
               {
-                if (!studentMessages.ContainsKey(t.Username))
+                if (!studentMessages.ContainsKey(t.Name))
                 {
-                  studentMessages[t.Username] = new List<Message>();
+                  studentMessages[t.Name] = new List<Message>();
                 }
-                studentMessages[t.Username].Add(new Message(user.Username, newMessage, t.Username, false));
+                studentMessages[t.Name].Add(new Message(user.Name, newMessage, t.Name, false));
               }
               else
               {
@@ -736,7 +735,7 @@ while (running)
                 if (newGrade == "IG" || newGrade == "G" || newGrade == "VG")
                 {
                   document.Grade = newGrade;
-                  document.Signed = t.Username;
+                  document.Signed = t.Name;
                   Console.WriteLine($"\nDocument '{document.Name}' has been graded with '{newGrade}'.");
                   Console.WriteLine("\nDo you want to add feedback? Leave empty if not.");
                   document.Feedback = Console.ReadLine();
@@ -778,7 +777,7 @@ while (running)
 
     if (active_user is Student s)
     {
-      Console.WriteLine($"\nWelcome to your main page, {s.Username}.\n");
+      Console.WriteLine($"\nWelcome to your main page, {s.Name}.\n");
       int newMessage = 0;
 
       foreach ((string msgKey, List<Message> msgList) in studentMessages)
@@ -850,7 +849,7 @@ while (running)
 
             if (!string.IsNullOrEmpty(newDocument))
             {
-              studentDocuments.Add(s.Username, new SDocument(s.Username, newDocument, documentCourse, "", "", ""));
+              studentDocuments.Add(s.Name, new SDocument(s.Name, newDocument, documentCourse, "", "", ""));
             }
             break;
 
@@ -861,7 +860,7 @@ while (running)
 
           foreach ((string docKey, SDocument document) in studentDocuments)
           {
-            if (s.Username == document.Author)
+            if (s.Name == document.Author)
             {
               if (document.Grade == "")
               {

@@ -3,7 +3,8 @@ namespace App;
 
 interface IUser
 {
-  string Username { get; }
+  string Name { get; }
+  string Email { get; }
   string _password { get; }
-  public bool TryLogin(string username, string password);
+  public bool TryLogin(string email, string password);
 }
