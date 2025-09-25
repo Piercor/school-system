@@ -297,12 +297,6 @@ while (running)
                         Console.ReadLine();
                         break;
                       }
-                      else
-                      {
-                        Console.WriteLine($"\n\nNo users found with the name {updateUser}.\n");
-                        Console.Write("\nPress ENTER to continue. ");
-                        Console.ReadLine();
-                      }
                     }
                   }
                 }
@@ -311,6 +305,9 @@ while (running)
                   Console.Write("\nInvalid input. Press ENTER to continue. ");
                   Console.ReadLine();
                 }
+                // Console.WriteLine($"\n\nNo users found with the name {updateUser}.\n");
+                // Console.Write("\nPress ENTER to continue. ");
+                // Console.ReadLine();
                 break;
 
               case "3": // Remove an account
@@ -384,12 +381,6 @@ while (running)
                         Console.ReadLine();
                         break;
                       }
-                      else
-                      {
-                        Console.WriteLine($"\nNo users found with the name {removeUser}");
-                        Console.Write("\nPress ENTER to continue. ");
-                        Console.ReadLine();
-                      }
                     }
                   }
                 }
@@ -398,6 +389,9 @@ while (running)
                   Console.Write("\nInvalid input. Press ENTER to continue. ");
                   Console.ReadLine();
                 }
+                // Console.WriteLine($"\nNo users found with the name {removeUser}");
+                // Console.Write("\nPress ENTER to continue. ");
+                // Console.ReadLine();
                 break;
 
               case "4": // Back to menu
@@ -740,7 +734,7 @@ while (running)
     {
       Console.WriteLine("\nWelcome to your main page, " + t.Name);
       Console.WriteLine("\n[1] Messages.");
-      Console.WriteLine("\n[2] Grade documents.");
+      Console.WriteLine("\n[2] See and grade documents.");
       Console.WriteLine("\n[3] Logout.\n");
       Console.WriteLine("\nChoose an option [1-3]");
 
@@ -750,7 +744,7 @@ while (running)
 
           Console.Clear();
           Console.Write("\n\nMessages. \n");
-          Console.WriteLine("\nWho do you want to message?\n");
+          Console.WriteLine("\n\nWho do you want to message?");
           Console.WriteLine("\n[1] Student.");
           Console.WriteLine("\n[2] Teacher.");
           Console.WriteLine("\n[3] Admin.");
@@ -810,36 +804,33 @@ while (running)
           {
             foreach (IUser user in users)
             {
-              if (messageUser == user.Name)
+              if (msgUserType == user.IsType)
               {
-                Console.WriteLine($"\nWrite a new message to {user.Name}:\n");
-                string newMessage = Console.ReadLine();
+                if (messageUser == user.Name)
+                {
+                  Console.WriteLine($"\nWrite a new message to {user.Name}:\n");
+                  string newMessage = Console.ReadLine();
 
-                if (!string.IsNullOrEmpty(newMessage))
-                {
-                  if (!studentMessages.ContainsKey(t.Name))
+                  if (!string.IsNullOrEmpty(newMessage))
                   {
-                    studentMessages[t.Name] = new List<Message>();
+                    if (!studentMessages.ContainsKey(t.Name))
+                    {
+                      studentMessages[t.Name] = new List<Message>();
+                    }
+                    studentMessages[t.Name].Add(new Message(user.Name, newMessage, t.Name, false));
+                    Console.WriteLine($"\n\nMessage sended to {user.Name}.\n");
+                    Console.Write("\nPress ENTER to continue. ");
+                    Console.ReadLine();
+
                   }
-                  studentMessages[t.Name].Add(new Message(user.Name, newMessage, t.Name, false));
-                  Console.WriteLine($"\n\nMessage sended to {user.Name}.\n");
-                  Console.Write("\nPress ENTER to continue. ");
-                  Console.ReadLine();
+                  else
+                  {
+                    Console.Write("\n\nMessage can't be empty. Press ENTER to continue. ");
+                    Console.ReadLine();
+                  }
+                  break;
                 }
-                else
-                {
-                  Console.Write("\n\nMessage can't be empty. Press ENTER to continue. ");
-                  Console.ReadLine();
-                }
-                break;
               }
-              else
-              {
-                Console.WriteLine($"\nNo users found with the name {messageUser}");
-                Console.Write("\nPress ENTER to continue. ");
-                Console.ReadLine();
-              }
-              break;
             }
           }
           else
@@ -847,6 +838,9 @@ while (running)
             Console.Write("\nInvalid input. Press ENTER to continue. ");
             Console.ReadLine();
           }
+          // Console.WriteLine($"\nNo users found with the name {messageUser}");
+          // Console.Write("\nPress ENTER to continue. ");
+          // Console.ReadLine();
           break;
 
         case "2":
@@ -934,9 +928,16 @@ while (running)
       {
         foreach (Message msg in msgList)
         {
-          if (msg.Read == false)
+          if (msg.Receiver == s.Name)
           {
-            newMessage++;
+            if (msg.Read == false)
+            {
+              newMessage++;
+            }
+          }
+          else
+          {
+            break;
           }
         }
       }
@@ -961,7 +962,14 @@ while (running)
                   int messageIndex = 0;
                   for (int i = 0; i < msgList.Count; i++)
                   {
-                    Console.WriteLine($"\n[{i + 1}] {(msg.Read ? "(Read)" : "(Unread)")} - from {msg.Sender}");
+                    if (msg.Receiver == s.Name)
+                    {
+                      Console.WriteLine($"\n[{i + 1}] {(msg.Read ? "(Read)" : "(Unread)")} - from {msg.Sender}");
+                    }
+                    else
+                    {
+                      break;
+                    }
                   }
                   string selectedMessage = Console.ReadLine();
                   if (int.TryParse(selectedMessage, out messageIndex) && messageIndex > 0 && messageIndex <= msgList.Count)
@@ -976,7 +984,6 @@ while (running)
                     Console.ReadLine();
                     break;
                   }
-
                 }
               }
             }
