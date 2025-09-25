@@ -23,7 +23,7 @@ List<IUser> users = new List<IUser>();
 
 users.Add(new Student("teststudent", "stu@dent", "pass", "Student"));
 users.Add(new Teacher("teacher", "tea@cher", "pass", "Teacher"));
-users.Add(new Admin("Default Admin", "ad@min", "pasa", "Admin"));
+users.Add(new Admin("Default Admin", "admin", "pass", "Admin"));
 
 Dictionary<string, SDocument> studentDocuments = new Dictionary<string, SDocument>();
 Dictionary<string, Course> studentCourses = new Dictionary<string, Course>();
@@ -164,6 +164,11 @@ while (running)
                   case "3":
                     newUserType = "Admin";
                     break;
+
+                  default:
+                    Console.Write("\nInvalid input. Press ENTER to continue. ");
+                    Console.ReadLine();
+                    break;
                 }
 
                 Console.Write($"\n{newUserType} name: ");
@@ -196,6 +201,99 @@ while (running)
                 break;
 
               case "2": // Update an account
+
+                Console.Clear();
+                Console.WriteLine("\n\nUpdate an account.\n");
+
+                Console.WriteLine("\nChoose the type of account you want to update");
+                Console.WriteLine("\n[1] Student.");
+                Console.WriteLine("\n[2] Teacher");
+                Console.WriteLine("\n[3] Admin");
+
+                string upUserType = "";
+
+                switch (Console.ReadLine())
+                {
+                  case "1":
+                    upUserType = "Student";
+                    break;
+
+                  case "2":
+                    upUserType = "Teacher";
+                    break;
+
+                  case "3":
+                    upUserType = "Admin";
+                    break;
+
+                  default:
+                    Console.Write("\nInvalid input. Press ENTER to continue. ");
+                    Console.ReadLine();
+                    break;
+                }
+
+                Console.WriteLine($"\n{upUserType}s accounts in the system:\n");
+
+                foreach (IUser user in users)
+                {
+                  if (upUserType == user.IsType)
+                  {
+                    Console.WriteLine(user.Name);
+                  }
+                }
+
+                Console.Write("\nChoose an account to update: ");
+                string updateUser = Console.ReadLine();
+
+                if (!string.IsNullOrEmpty(updateUser))
+                {
+                  foreach (IUser user in users)
+                  {
+                    if (upUserType == user.IsType)
+                    {
+                      if (updateUser == user.Name)
+                      {
+                        Console.Clear();
+                        Console.WriteLine($"\n\nUpdate {updateUser}'s info (leave empty if you don't want to make changes).\n");
+
+                        Console.Write("\nNew name: ");
+                        string upUserName = Console.ReadLine();
+                        Console.Write("\nNew email: ");
+                        string upUserEmail = Console.ReadLine();
+                        Console.Write("\nNew password: ");
+                        string upUserPass = Console.ReadLine();
+
+                        if (!string.IsNullOrEmpty(upUserName))
+                        {
+                          user.Name = upUserName;
+                        }
+                        if (!string.IsNullOrEmpty(upUserEmail))
+                        {
+                          user.Email = upUserEmail;
+                        }
+                        if (!string.IsNullOrEmpty(upUserPass))
+                        {
+                          user._password = upUserPass;
+                        }
+                        Console.WriteLine($"\nUpdates done to {upUserType.ToLower()} '{updateUser}'");
+                        Console.Write("\nPress ENTER to continue. ");
+                        Console.ReadLine();
+                        break;
+                      }
+                      else
+                      {
+                        Console.WriteLine($"\nNo users found with the name {updateUser}");
+                        Console.Write("\nPress ENTER to continue. ");
+                        Console.ReadLine();
+                      }
+                    }
+                  }
+                }
+                else
+                {
+                  Console.Write("\nInvalid input. Press ENTER to continue. ");
+                  Console.ReadLine();
+                }
 
                 break;
 
@@ -309,7 +407,6 @@ while (running)
                 {
                   Console.Clear();
 
-
                   Console.WriteLine($"\n\n{choosedCourse} - Overview.\n");
 
                   foreach ((string courseKey, Course course) in studentCourses)
@@ -327,16 +424,15 @@ while (running)
                   }
                   Console.Write("\n\nPress ENTER to continue. ");
                   Console.ReadLine();
-                  break;
                 }
                 else
                 {
                   Console.Write("\nInvalid input. Press ENTER to continue. ");
                   Console.ReadLine();
-                  break;
                 }
                 break;
               }
+
             case "2": // Add new course
               Console.Clear();
 
