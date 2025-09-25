@@ -20,9 +20,9 @@ using System.Threading.Tasks.Dataflow;
 using App;
 
 List<IUser> users = new List<IUser>();
-users.Add(new Student("teststudent", "t@s", "pass"));
-users.Add(new Teacher("teacher", "password"));
-users.Add(new Admin("Default Admin", "admin", "admin"));
+users.Add(new Student("teststudent", "t@s", "pass", "Student"));
+users.Add(new Teacher("teacher", "password", "Teacher"));
+users.Add(new Admin("Default Admin", "admin", "admin", "Admin"));
 
 Dictionary<string, SDocument> studentDocuments = new Dictionary<string, SDocument>();
 Dictionary<string, Course> studentCourses = new Dictionary<string, Course>();
@@ -160,7 +160,7 @@ while (running)
                 }
                 else
                 {
-                  users.Add(new Student(newStudentName, newStudentEmail, newStudentPass));
+                  users.Add(new Student(newStudentName, newStudentEmail, newStudentPass, "Student"));
                 }
                 break;
 
@@ -178,7 +178,7 @@ while (running)
                 }
                 else
                 {
-                  users.Add(new Teacher(newTeacherUsername, newTeacherPass));
+                  users.Add(new Teacher(newTeacherUsername, newTeacherPass, "Teacher"));
                 }
                 break;
 
@@ -199,7 +199,7 @@ while (running)
                 }
                 else
                 {
-                  users.Add(new Admin(newAdminName, newAdminUsername, newAdminPass));
+                  users.Add(new Admin(newAdminName, newAdminUsername, newAdminPass, "Admin"));
                 }
                 break;
 
@@ -215,8 +215,8 @@ while (running)
           }
 
         case "2": // Remove an account
-
-          Console.WriteLine("\nWhich type of account do you want to remove?\n");
+          Console.Clear();
+          Console.WriteLine("\n\nWhich type of account do you want to remove?\n");
           Console.WriteLine("\n[1] Student.");
           Console.WriteLine("\n[2] Teacher.");
           Console.WriteLine("\n[3] Admin.");
@@ -247,19 +247,20 @@ while (running)
 
           if (filteredUsers.Count == 0)
           {
-            Console.WriteLine($"\nNo users of type {selectedType} where found.");
+            Console.WriteLine($"\nNo users of type {selectedType.Name.ToLower()} where found.");
             Console.Write($"\nPress ENTER to continue. ");
             Console.ReadLine();
+            break;
           }
 
-          Console.WriteLine($"\n{selectedType.Name}s");
+          Console.WriteLine($"\n{selectedType.Name}s:?\n");
 
           foreach (var user in filteredUsers)
           {
             Console.WriteLine(user.Username);
           }
 
-          Console.Write($"\nEnter the username of the {selectedType.Name} to remove: ");
+          Console.Write($"\nEnter the username of the {selectedType.Name.ToLower()} to remove: ");
           string selectedUser = Console.ReadLine();
 
           IUser removeUser = users.FirstOrDefault(u => u.Username.Equals(selectedUser, StringComparison.OrdinalIgnoreCase));
@@ -836,7 +837,6 @@ while (running)
             Console.WriteLine("\nYou have no messages.");
             Console.Write("\nPress ENTER to continue. ");
             Console.ReadLine();
-            break;
           }
           break;
 
