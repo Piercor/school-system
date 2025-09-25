@@ -148,7 +148,7 @@ while (running)
                 Console.WriteLine("\n[2] Create a new teacher account.");
                 Console.WriteLine("\n[3] Create a new admin account.");
                 Console.WriteLine("\n[4] Back to previous menu.");
-                Console.Write("\nChoose an option [1-4]: ");
+                Console.Write("\nSelect an option [1-4]: ");
                 string newUserType = "";
 
                 switch (Console.ReadLine())
@@ -163,6 +163,9 @@ while (running)
 
                   case "3":
                     newUserType = "Admin";
+                    break;
+
+                  case "4":
                     break;
 
                   default:
@@ -205,10 +208,12 @@ while (running)
                 Console.Clear();
                 Console.WriteLine("\n\nUpdate an account.\n");
 
-                Console.WriteLine("\nChoose the type of account you want to update");
+                Console.WriteLine("\nSelect the type of account you want to update:\n");
                 Console.WriteLine("\n[1] Student.");
                 Console.WriteLine("\n[2] Teacher");
                 Console.WriteLine("\n[3] Admin");
+                Console.WriteLine("\n[4] Back to previous menu.");
+                Console.Write("\nSelect an option [1-4]: ");
 
                 string upUserType = "";
 
@@ -226,22 +231,34 @@ while (running)
                     upUserType = "Admin";
                     break;
 
+                  case "4":
+                    break;
+
                   default:
                     Console.Write("\nInvalid input. Press ENTER to continue. ");
                     Console.ReadLine();
                     break;
                 }
+                Console.Clear();
+                Console.WriteLine($"\n\n{upUserType}s accounts in the system:\n\n");
 
-                Console.WriteLine($"\n{upUserType}s accounts in the system:\n");
-
-                foreach (IUser user in users)
+                if ((upUserType == "Student" && !users.Any(u => u is Student)) || (upUserType == "Teacher" && !users.Any(u => u is Teacher)) || (upUserType == "Admin" && !users.Any(u => u is Admin)))
                 {
-                  if (upUserType == user.IsType)
+                  Console.WriteLine($"No users of type {upUserType.ToLower()} were found");
+                  Console.Write("\n\nPress ENTER to continue. ");
+                  Console.ReadLine();
+                  break;
+                }
+                else
+                {
+                  foreach (IUser user in users)
                   {
-                    Console.WriteLine(user.Name);
+                    if (upUserType == user.IsType)
+                    {
+                      Console.WriteLine(user.Name);
+                    }
                   }
                 }
-
                 Console.Write("\nChoose an account to update: ");
                 string updateUser = Console.ReadLine();
 
@@ -275,14 +292,14 @@ while (running)
                         {
                           user._password = upUserPass;
                         }
-                        Console.WriteLine($"\nUpdates done to {upUserType.ToLower()} '{updateUser}'");
+                        Console.WriteLine($"\n\nUpdates done to {upUserType.ToLower()} '{updateUser}'.\n");
                         Console.Write("\nPress ENTER to continue. ");
                         Console.ReadLine();
                         break;
                       }
                       else
                       {
-                        Console.WriteLine($"\nNo users found with the name {updateUser}");
+                        Console.WriteLine($"\n\nNo users found with the name {updateUser}.\n");
                         Console.Write("\nPress ENTER to continue. ");
                         Console.ReadLine();
                       }
@@ -294,11 +311,92 @@ while (running)
                   Console.Write("\nInvalid input. Press ENTER to continue. ");
                   Console.ReadLine();
                 }
-
                 break;
 
               case "3": // Remove an account
+                Console.Clear();
+                Console.WriteLine("\n\nSelect the type of account you want to remove:\n");
+                Console.WriteLine("\n[1] Student.");
+                Console.WriteLine("\n[2] Teacher.");
+                Console.WriteLine("\n[3] Admin.");
+                Console.WriteLine("\n[4] Back to previous menu.");
+                Console.Write("\nSelect an option [1-4]: ");
 
+                string remUserType = "";
+
+                switch (Console.ReadLine())
+                {
+                  case "1":
+                    remUserType = "Student";
+                    break;
+
+                  case "2":
+                    remUserType = "Teacher";
+                    break;
+                  case "4":
+                    break;
+
+                  case "3":
+                    remUserType = "Admin";
+                    break;
+
+                  default:
+                    Console.Write("\nInvalid selection. Press ENTER to continue. ");
+                    Console.ReadLine();
+                    break;
+                }
+
+                Console.Clear();
+                Console.WriteLine($"\n\n{remUserType}s accounts in the system:\n\n");
+
+                if ((remUserType == "Student" && !users.Any(u => u is Student)) || (remUserType == "Teacher" && !users.Any(u => u is Teacher)) || (remUserType == "Admin" && !users.Any(u => u is Admin)))
+                {
+                  Console.WriteLine($"No users of type {remUserType.ToLower()} were found");
+                  Console.Write("\n\nPress ENTER to continue. ");
+                  Console.ReadLine();
+                  break;
+                }
+                else
+                {
+                  foreach (IUser user in users)
+                  {
+                    if (remUserType == user.IsType)
+                    {
+                      Console.WriteLine(user.Name);
+                    }
+                  }
+                }
+                Console.Write("\n\nChoose an account to remove: ");
+                string removeUser = Console.ReadLine();
+
+                if (!string.IsNullOrEmpty(removeUser))
+                {
+                  foreach (IUser user in users)
+                  {
+                    if (remUserType == user.IsType)
+                    {
+                      if (removeUser == user.Name)
+                      {
+                        users.Remove(user);
+                        Console.WriteLine($"\n\nUser '{removeUser}' has been removed.\n");
+                        Console.Write("\nPress ENTER to continue. ");
+                        Console.ReadLine();
+                        break;
+                      }
+                      else
+                      {
+                        Console.WriteLine($"\nNo users found with the name {removeUser}");
+                        Console.Write("\nPress ENTER to continue. ");
+                        Console.ReadLine();
+                      }
+                    }
+                  }
+                }
+                else
+                {
+                  Console.Write("\nInvalid input. Press ENTER to continue. ");
+                  Console.ReadLine();
+                }
                 break;
 
               case "4": // Back to menu
@@ -311,70 +409,6 @@ while (running)
             }
             break;
           }
-
-        case "X": // Remove an account
-          Console.Clear();
-          Console.WriteLine("\n\nWhich type of account do you want to remove?\n");
-          Console.WriteLine("\n[1] Student.");
-          Console.WriteLine("\n[2] Teacher.");
-          Console.WriteLine("\n[3] Admin.");
-          Console.Write("\nType [1-3]: ");
-
-          Type selectedType = null;
-
-          switch (Console.ReadLine())
-          {
-            case "1":
-              selectedType = typeof(Student);
-              break;
-
-            case "2":
-              selectedType = typeof(Teacher);
-              break;
-
-            case "3":
-              selectedType = typeof(Admin);
-              break;
-            default:
-              Console.Write("\nInvalid selection. Press ENTER to continue. ");
-              Console.ReadLine();
-              break;
-          }
-
-          var filteredUsers = users.Where(u => u.GetType() == selectedType).ToList();
-
-          if (filteredUsers.Count == 0)
-          {
-            Console.WriteLine($"\nNo users of type {selectedType.Name.ToLower()} where found.");
-            Console.Write($"\nPress ENTER to continue. ");
-            Console.ReadLine();
-            break;
-          }
-
-          Console.WriteLine($"\n{selectedType.Name}s:?\n");
-
-          foreach (var user in filteredUsers)
-          {
-            Console.WriteLine(user.Name);
-          }
-
-          Console.Write($"\nEnter the username of the {selectedType.Name.ToLower()} to remove: ");
-          string selectedUser = Console.ReadLine();
-
-          IUser removeUser = users.FirstOrDefault(u => u.Name.Equals(selectedUser, StringComparison.OrdinalIgnoreCase));
-
-          if (removeUser != null)
-          {
-            users.Remove(removeUser);
-            Console.WriteLine($"\nUser {selectedUser} has been removed.");
-          }
-          else
-          {
-            Console.WriteLine($"\nUser {selectedUser} not found.");
-          }
-          Console.Write("\nPress ENTER to continue. ");
-          Console.ReadLine();
-          break;
 
         case "2": // Manage courses
 
